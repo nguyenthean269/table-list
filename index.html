@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+
+	<table-list>
+		<div ng-repeat="item in listData">
+			Item {{item}} <a item-show ng-click="currentitem = $index">[show item detail]</a>
+		</div>
+	</table-list>
+	<table-item>
+		<a table-show>[back to table]</a>
+		<br />
+		{{listData[currentitem]}}
+	</table-item>
+{{_show.show}}
+
+
+
+<script>
+var app = angular.module("myApp", []);
+
+app.factory('dataService', [function(){
+  return {show:true};
+}]);
+app.controller("myCtrl", function($scope, dataService) {
+
+	$scope.listData = ["Đây là item 1", "Đây là item 2"];
+	$scope.currentitem = 0;
+	$scope._show = dataService;
+
+});
+
+
+
+
+app.directive("tableList", function($compile, dataService) {
+    return {
+        restrict : "E",
+        transclude:true,
+	    template:'<div ng-show="_show.show" ng-transclude></div>'
+    };
+});
+app.directive("tableItem", function($compile, dataService) {
+    return {
+        restrict : "E",
+        transclude:true,
+	    template:'<div ng-hide="_show.show" ng-transclude></div>'
+    };
+});
+app.directive("itemShow", function($parse, dataService) {
+  return {
+  	restrict: 'A',
+    compile: function(tElm,tAttrs){
+      return function(scope,elm){
+        elm.bind('click',function(){
+	      	dataService.show = false;
+	      	scope._show = dataService.show;
+	        scope.$apply();
+        });  
+      };
+    }
+  };
+});
+app.directive("tableShow", function($parse, dataService) {
+  return {
+    compile: function(tElm,tAttrs){
+      return function(scope,elm){
+        elm.bind('click',function(){
+	      	dataService.show = true;
+	      	scope._show = dataService.show;
+	        scope.$apply();
+        });
+      };
+    }
+  };
+});
+</script>
+
+</body>
+</html>
